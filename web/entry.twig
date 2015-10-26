@@ -1,0 +1,36 @@
+{#
+ Swig/Twig template zur Javascript-Verarbeitung
+ einer Tabellenzeile in der Ausgabe
+#}
+
+{# erwartet dass "data" die json-Daten sind #}
+
+<section class="panel panel-with-bar" id="job-{{ data.job.id }}">
+	<div class="panel-header">
+		<b class="state error">Fehler</b>
+
+		<b>{{ data.job.id }}</a></b>
+
+		<ul class="fa-ul">
+			<li><a href="{{ data.web.json }}"><i class="fa fa-wrench"></i> config</a>
+			<li><a href="{{ data.web.log }}"><i class="fa fa-tasks"></i> logfile</a>
+			<li><a href="{{ data.web.dir }}"><i class="fa fa-folder"></i> directory</a>
+		</ul>
+
+		<div class="state missing-state">Missing state!</div>
+	</div>
+	<div class="panel-body">
+		<span class="state error"><i class="fa fa-exclamation-circle text-danger"></i> <b>Error:</b> {{ data.msg }}</span>
+
+		<p>
+		<span class="state wait-for-ods"><i class="fa fa-spinner fa-spin text-primary"></i> Generating Excel sheet</span>
+		<span class="state after finished-ods"><i class="fa fa-check text-success"></i> Finished Excel sheet</span>
+		<a href="{{ data.web.ods}}" class="state after finished-ods"><i class="fa fa-file-text-o"></i> {{ data.job.ods_filename }}</a>
+
+		<p>
+		<span class="state wait-for-pdf"><i class="fa fa-spinner fa-spin text-primary"></i> Generating PDF</span>
+		<span class="state after finished-pdf"><i class="fa fa-check text-success"></i> Finished PDF</span>
+
+		<a href="{{ data.web.pdf }}" class="state after finished-pdf"><i class="fa fa-file-pdf-o"></i> {{ data.job.pdf_filename }}</a>
+	</div>
+</div>

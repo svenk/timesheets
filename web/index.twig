@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% use 'ajax-modal.html' %}
+
+
+{% block title %}Mindestlohn-Generator für Hiwi und wissenschaftliche Mitarbeiter-Stellen an der Universität{% endblock %}
+
+{% block additional_header %}
+	<script src="{{ asset_path }}/js/jquery.js"></script>
+	<script src="{{ asset_path }}/js/bootstrap-button.js"></script>
+
+	<!-- arbitrary HTML5 date shim polyfill -->
+	<!-- dieser Polyfill ist sauhaesslich
+
+	<script src="{{ asset_path }}/lib/date-polyfill/modernizr.custom-input.js"></script>
+	<script src="{{ asset_path }}/lib/date-polyfill/date-polyfill.js"></script>
+	<link  href="{{ asset_path }}/lib/date-polyfill/date-polyfill.css" rel="stylesheet" type="text/css">
+	<script src="{{ asset_path }}/lib/jquery-ui/jquery-ui.min.js"></script>
+	<link  href="{{ asset_path }}/lib/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css">
+	<link  href="{{ asset_path }}/lib/jquery-ui/jquery-ui.theme.min.css" rel="stylesheet" type="text/css">
+
+	-->
+
+	<!-- ein besserer polyfill -->
+	<script src="{{ asset_path }}/lib/better-dateinput-polyfill/dist/better-dom.js"></script>
+	<script src="{{ asset_path }}/lib/better-dateinput-polyfill/dist/better-i18n-plugin.js"></script>
+	<script src="{{ asset_path }}/lib/better-dateinput-polyfill/i18n/better-dateinput-polyfill.de.js"></script>
+	<script src="{{ asset_path }}/lib/better-dateinput-polyfill/dist/better-dateinput-polyfill.js"></script>
+
+	<!-- Twig client side templating -->
+	<script src="{{ asset_path }}/lib/Swig/swig.min.js"></script>
+
+	<!-- client side code -->
+	<script src="mindestlohn.js"></script>
+
+	<style>
+		#results ul.fa-ul { margin-left: 0; }
+	</style>
+{% endblock %}
+
+
+{% block sidebar %}
+	<div class="visible-xs-block">
+		<h2 id="office">Further links</h2>
+	</div>
+	<div class="panel panel-sidebar blue">
+		<h2>Der Mindestlohn</h2>
+		<div class="panel-body">
+			<span class="caret"></span>
+			<p>Das <a href="https://de.wikipedia.org/wiki/Mindestlohngesetz_%28Deutschland%29">Mindestlohngesetz</a>
+			(<a href="http://www.gesetze-im-internet.de/milog/">MiLoG</a>) sieht vor, dass alle geringfügig Beschäftigten,
+			zu denen leider auch Hilfswissenschaftler (Hiwis) und wissenschaftliche Mitarbeiter zählen, ihre Arbeitszeit
+			dokumentieren um Ausbeutung zu dokumentieren.
+
+			<p>Während ich einen Mindestlohn für eine gute Idee halte, wurde mit diesem Dokumentationszwang aber insbesondere
+			im akademischen Umfeld ein absurdes Bürokratiemonster erfunden. Die Hiwi-Entsoldung mit 8,50 €/Stunde ist zwar
+			jenseits von rosig, aber in vielen Hiwi-Beschäftigungsverhältnissen wird nicht so genau auf die Stundenarbeitszeit
+			geachtet (etwa bei freier Zeiteinteilung). Daher geht es bloß darum, ob die Anzahl Stunden pro Monat "stimmen".
+
+			<p>Typische Hiwi-Verträge gehen über 20, 40, 60 oder 80 Stunden pro Monat, was zwischen 200-700 €/Monat entspricht.
+			Mit diesem <em>Generator</em> kann man sich derartige Tabellen mit zufälligen Arbeitszeiten generieren lassen.
+		</div>
+	</div>
+
+	<div class="panel panel-sidebar">
+		<h2>Formulare</h2>
+		<div class="panel-body">
+			<span class="caret"></span>
+			<p>Links zu offiziellen Dokumenten:
+			<ul class="icons">
+				<li><a href="https://www.uni-frankfurt.de/47065133/formularcenter#hilfskraefte"><i></i> Formularcenter Personalservices Uni Frankfurt: Hilfskräfte</a>
+				<li><a href="https://www.uni-frankfurt.de/56082110/Stundenzettel.xlsx"><i></i> Dort: Stundenzettel.xlsx</a>
+			</ul>
+		</div>
+	</div>
+
+	<div class="panel panel-sidebar">
+		<h2>Zeiterfassung</h2>
+		<div class="panel-body">
+			<span class="caret"></span>
+
+			<p>Michael Gecht programmiert <a href="http://clock.idiotism.us/">Clock</a>, eine
+			Zeiterfassungsapp zum Erstellen von Stundenzetteln auf Basis wirklicher Daten.
+			<a href="https://github.com/mimischi/django-clock">Quelltext der Django-Clock</a>
+
+			<p style="text-align:center">
+			<img src="https://raw.githubusercontent.com/mimischi/django-clock/master/clock/static/img/ClockLogo_V1_mit-Goethe.png" style="width:80%">
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block main_column %}
+
+<div class="panel panel-regular">
+<div class="panel-header">
+	<h2>Mindestlohn-Generator</h2>
+</div>
+<div class="panel-body">
+	<form class="form-horizontal job-submission" method="get" action="submit.php">
+	  <div class="form-group">
+	    <label for="input-from" class="col-sm-2 control-label">Zeitspanne</label>
+	    <div class="col-sm-10 form-inline">
+		<input type="date" class="form-control" name="date-from" id="input-from" placeholder="Von">
+		<input type="date" class="form-control" name="date-to" id="input-to" placeholder="Bis">
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label for="input-hours" class="col-sm-2 control-label">Stunden</label>
+	    <div class="col-sm-10 form-inline">
+		<input type="number" class="form-control" id="input-hours" min="1" max="83" value="40" required> pro
+		<select class="form-control" name="timebase">
+			<option value="month">Monat</option>
+			<option value="week">Woche</option>
+		</select>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label for="input-hours" class="col-sm-2 control-label">Arbeitszeiten</label>
+	    <div class="col-sm-10">
+	      <div class="checkbox">
+		<label><input type="checkbox" name="pause" value="true"> Pausen einfügen</label>
+	      </div>
+	      <div class="checkbox">
+		<label><input type="checkbox" name="saturdays" value="true"> Samstags arbeiten</label>
+	      </div>
+	      <div class="checkbox">
+		<label><input type="checkbox" name="sundays" value="true"> Sonntags arbeiten</label>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <div class="col-sm-offset-2 col-sm-10">
+	      <button type="submit" class="btn btn-primary">Generieren <i class="fa fa-spinner fa-spin working hide"></i></button>
+	    </div>
+	  </div>
+	</form>
+
+</div>
+</div>
+
+<div id="results">
+</div>
+
+<p style="margin-top:2em;"><em>Hinweis:</em> Leider ist der Generator derzeit recht langsam (ca. 20 Sekunden Bearbeitungsdauer).
+Er wird noch weiterentwickelt.</p>
+
+
+{% endblock %}
